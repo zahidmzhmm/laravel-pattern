@@ -2,14 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Dto\BlogPostDto;
 use App\Enums\BlogPostSource;
+use App\Http\Requests\App\BlogPostRequest;
+use App\Http\Resources\App\BlogPostResource;
 use App\Models\Blog;
+use App\Services\Blog\BlogPostService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class BlogPostController extends Controller
 {
+    public function __construct(
+        protected BlogPostService $service
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -31,20 +41,13 @@ class BlogPostController extends Controller
      * Store a newly created resource in storage.
      *
      * @param Request $request
-     * @return RedirectResponse
+     * @return BlogPostResource
      */
-    public function store(Request $request): RedirectResponse
+    public function store(BlogPostRequest $request): BlogPostResource
     {
-        $request->validate([
-            "title" => "required|string",
-            "content" => "required|string",
-        ]);
-        $blogPost = new Blog();
-        $blogPost->title = $request->get("title");
-        $blogPost->content = $request->get("content");
-        $blogPost->source = BlogPostSource::APP;
-        $blogPost->save();
-        return redirect()->route("blog.index")->with("success", "Blog Post Created Successfully");
+        $post = $this->service->store(dto: BlogPostDto::fromAppRequest($request));
+        return BlogPostResource::make($post);
+//        return redirect()->route("blog.index")->with("success", "Blog Post Created Successfully");
     }
 
     /**
@@ -68,18 +71,14 @@ class BlogPostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id): RedirectResponse
+    public function update(BlogPostRequest $request, Blog $blog): BlogPostResource
     {
-        $request->validate([
-            "title" => "required|string",
-            "content" => "required|string",
-        ]);
-        $blog = Blog::find($id);
-        $blog->title = $request->get("title");
-        $blog->content = $request->get("content");
-        $blog->source = BlogPostSource::APP;
-        $blog->save();
-        return redirect()->route("blog.index")->with("success", "Blog Post Updated Successfully");
+        $blog = $this->service->update(
+            blog: $blog,
+            dto: BlogPostDto::fromAppRequest($request)
+        );
+        return BlogPostResource::make($blog);
+//        return redirect()->route("blog.index")->with("success", "Blog Post Updated Successfully");
     }
 
     /**

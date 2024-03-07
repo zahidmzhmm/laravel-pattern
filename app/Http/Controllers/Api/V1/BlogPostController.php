@@ -2,14 +2,24 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Dto\BlogPostDto;
 use App\Enums\BlogPostSource;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\BlogPostRequest;
+use App\Http\Resources\Api\BlogPostResource;
 use App\Models\Blog;
+use App\Services\Blog\BlogPostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BlogPostController extends Controller
 {
+    public function __construct(
+        protected BlogPostService $service
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -22,18 +32,12 @@ class BlogPostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): JsonResponse
+    public function store(BlogPostRequest $request): BlogPostResource
     {
-        $request->validate([
-            "title" => "required|string",
-            "content" => "required|string",
-        ]);
-        $blogPost = new Blog();
-        $blogPost->title = $request->get("title");
-        $blogPost->content = $request->get("content");
-        $blogPost->source = BlogPostSource::API;
-        $blogPost->save();
-        return response()->json(["status" => "success", "message" => "Blog Post Created Successfully", "data" => $blogPost], 201);
+        $blogPost = $this->service->store(
+            dto: BlogPostDto::fromApiRequest($request)
+        );
+        return BlogPostResource::make($blogPost);
     }
 
     /**
@@ -51,17 +55,13 @@ class BlogPostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(BlogPostRequest $request, Blog $blog): BlogPostResource
     {
-        $blogPost = Blog::find($id);
-        if (!$blogPost) {
-            return response()->json(["status" => "error", "message" => "Blog Post Not Found"], 404);
-        }
-        $blogPost->title = !empty($request->get("title")) ? $request->get("title") : $blogPost->title;
-        $blogPost->content = !empty($request->get("content")) ? $request->get("content") : $blogPost->content;
-        $blogPost->source = BlogPostSource::API;
-        $blogPost->save();
-        return response()->json(["status" => "success", "message" => "Blog Post Updated Successfully", "data" => $blogPost], 200);
+        $post = $this->service->update(
+            blog: $blog,
+            dto: BlogPostDto::fromApiRequest($request)
+        );
+        return BlogPostResource::make($post);
     }
 
     /**

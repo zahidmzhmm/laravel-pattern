@@ -13,4 +13,10 @@ class Blog extends Model
     protected $casts = [
         "source" => BlogPostSource::class,
     ];
+
+    protected $fillable = [
+        "title",
+        "content",
+        "source"
+    ];
 }

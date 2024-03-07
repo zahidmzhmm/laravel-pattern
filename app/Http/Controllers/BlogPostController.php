@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Dto\BlogPostDto;
-use App\Enums\BlogPostSource;
 use App\Http\Requests\App\BlogPostRequest;
-use App\Http\Resources\App\BlogPostResource;
 use App\Models\Blog;
 use App\Services\Blog\BlogPostService;
 use Illuminate\Contracts\View\View;
@@ -14,10 +12,11 @@ use Illuminate\Http\Request;
 
 class BlogPostController extends Controller
 {
-    public function __construct(
-        protected BlogPostService $service
-    )
+    protected BlogPostService $service;
+
+    public function __construct(BlogPostService $service)
     {
+        $this->service = $service;
     }
 
     /**
@@ -41,13 +40,12 @@ class BlogPostController extends Controller
      * Store a newly created resource in storage.
      *
      * @param Request $request
-     * @return BlogPostResource
+     * @return RedirectResponse
      */
-    public function store(BlogPostRequest $request): BlogPostResource
+    public function store(BlogPostRequest $request): RedirectResponse
     {
-        $post = $this->service->store(dto: BlogPostDto::fromAppRequest($request));
-        return BlogPostResource::make($post);
-//        return redirect()->route("blog.index")->with("success", "Blog Post Created Successfully");
+        $this->service->store(dto: BlogPostDto::fromAppRequest($request));
+        return redirect()->route("blog.index")->with("success", "Blog Post Created Successfully");
     }
 
     /**
@@ -71,14 +69,13 @@ class BlogPostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(BlogPostRequest $request, Blog $blog): BlogPostResource
+    public function update(BlogPostRequest $request, Blog $blog): RedirectResponse
     {
-        $blog = $this->service->update(
+        $this->service->update(
             blog: $blog,
             dto: BlogPostDto::fromAppRequest($request)
         );
-        return BlogPostResource::make($blog);
-//        return redirect()->route("blog.index")->with("success", "Blog Post Updated Successfully");
+        return redirect()->route("blog.index")->with("success", "Blog Post Updated Successfully");
     }
 
     /**

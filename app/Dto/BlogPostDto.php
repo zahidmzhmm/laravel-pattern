@@ -20,8 +20,8 @@ readonly class BlogPostDto
     public static function fromAppRequest(AppBlogPostRequest $request): BlogPostDto
     {
         return new self(
-            title: $request->validated("title"),
-            content: $request->validated("content"),
+            title: data_get($request, "title", "Untitled"),
+            content: data_get($request, "content"),
             source: BlogPostSource::APP
         );
     }
@@ -29,8 +29,8 @@ readonly class BlogPostDto
     public static function fromApiRequest(ApiBlogPostRequest $request): BlogPostDto
     {
         return new self(
-            title: $request->validated("title"),
-            content: $request->validated("content"),
+            title: data_get($request, "title", "Untitled"),
+            content: data_get($request, "content"),
             source: BlogPostSource::API
         );
     }

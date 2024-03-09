@@ -9,6 +9,7 @@ use App\Http\Resources\Api\BlogPostResource;
 use App\Models\Blog;
 use App\Services\Blog\BlogPostService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class BlogPostController extends Controller
 {
@@ -22,10 +23,9 @@ class BlogPostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(): AnonymousResourceCollection
     {
-        $blogPosts = Blog::all();
-        return response()->json($blogPosts);
+        return BlogPostResource::collection(Blog::paginate(10));
     }
 
     /**
@@ -42,13 +42,9 @@ class BlogPostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id): JsonResponse
+    public function show(Blog $blog): BlogPostResource
     {
-        $blogPost = Blog::find($id);
-        if (!$blogPost) {
-            return response()->json(["status" => "error", "message" => "Blog Post Not Found"], 404);
-        }
-        return response()->json(["success" => "success", "data" => $blogPost], 200);
+        return BlogPostResource::make($blog);
     }
 
     /**

@@ -66,13 +66,9 @@ class BlogPostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(Blog $blog): JsonResponse
     {
-        $blogPost = Blog::find($id);
-        if (!$blogPost) {
-            return response()->json(["status" => "error", "message" => "Blog Post Not Found"], 404);
-        }
-        $blogPost->delete();
+        $this->service->forceDelete($blog);
         return response()->json(["status" => "success", "message" => "Blog Post Deleted Successfully"], 200);
     }
 }

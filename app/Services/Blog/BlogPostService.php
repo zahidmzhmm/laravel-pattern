@@ -23,4 +23,9 @@ class BlogPostService
             'content' => $dto->content,
         ]);
     }
+
+    public function forceDelete(Blog $blog): bool
+    {
+        return $blog->delete();
+    }
 }

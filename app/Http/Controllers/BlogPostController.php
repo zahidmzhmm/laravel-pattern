@@ -81,9 +81,8 @@ class BlogPostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id): RedirectResponse
+    public function destroy(Blog $blog): RedirectResponse
     {
-        $blog = Blog::find($id);
         $blog->delete();
         return redirect()->route("blog.index")->with("success", "Blog Post Deleted Successfully");
     }

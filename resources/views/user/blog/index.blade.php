@@ -9,8 +9,8 @@
         <div class="max-w-7xl bg-slate-100 py-5 rounded-xl mx-auto sm:px-6 lg:px-8 space-y-5">
             @include("errors")
             <ul role="list" class="divide-y divide-gray-100">
-                @if($blogs->count()>=1)
-                    @foreach($blogs as $blog)
+                @if($data->count()>=1)
+                    @foreach($data as $blog)
                         <li class="flex justify-between bg-slate-200 hover:bg-slate-300 gap-x-6 rounded-md duration-300 mb-2 p-5">
                             <div class="flex min-w-0 gap-x-4">
                                 <div class="min-w-0 flex-auto">{{ $blog->title }}</div>
